@@ -23,8 +23,8 @@ def_source <- "yahoo"
 def_div_adj_switch <- TRUE
 def_splt_adj_switch <- TRUE
 def_freq <- "d"    # daily
-def_watchlist_colnames <- c("LocalTicker","Currency","SecurityType","Comments")
-def_hist_prc_colnames <- c("LocalTicker","Currency","SecurityType","Frequency",
+def_watchlist_colnames <- c("Symbol","Currency","Security Type","Comments")
+def_hist_prc_colnames <- c("Symbol","Currency","Security Type","Frequency",
                            "SpltAdj","DivAdj","AdjMethod",
                            "HistBegDate","HistEndDate","RunResult")
 def_manual_adj_switch <- FALSE
@@ -37,17 +37,17 @@ FinancialSecurityHistoricalData <- function(id = 1,
                                             hist_enddate = NULL,
                                             watchlist = NULL){
   InitWatchlist <- function(){
-    return(data.frame(LocalTicker = character(0),
+    return(data.frame(Symbol = character(0),
                       Currency = character(0),
-                      SecurityType = character(0),
+                      `Security Type` = character(0),
                       Comments = character(0),
                       stringsAsFactors = FALSE))
   }
   
   InitResultSummary <- function(){
-    return(data.frame(LocalTicker = character(0),
+    return(data.frame(Symbol = character(0),
                       Currency = character(0),
-                      SecurityType = character(0),
+                      `Security Type` = character(0),
                       Frequency = character(0),
                       SpltAdj = character(0),
                       DivAdj = character(0),
@@ -140,11 +140,11 @@ FSHDObtainHistPrc.default <- function(fshd, single_security){ return(fshd) }
 FSHDObtainHistPrc.FinancialSecurityHistoricalData <- function(fshd, single_security){
 
   if(identical(colnames(single_security), def_watchlist_colnames)){
-    # Field: c("LocalTicker","Currency","SecurityType","Comments")
-    tik <- single_security$LocalTicker
+    # Field: c("Symbol","Currency","`Security Type`","Comments")
+    tik <- single_security$Symbol
     c <- single_security$Currency
     yahoo.tik <- ifelse(c=="CAD",paste(tik,".TO",sep=""),tik)
-    st <- single_security$SecurityType
+    st <- single_security$`Security Type`
     bd <- fshd$FSHD_hist_startdate
     ed <- fshd$FSHD_hist_enddate
     src <- fshd$FSHD_source
@@ -198,7 +198,7 @@ FSHDObtainAllHistPrcs <- function(fshd) UseMethod("FSHDObtainAllHistPrcs")
 FSHDObtainAllHistPrcs.default <- function(fshd){ return(fshd) }
 FSHDObtainAllHistPrcs.FinancialSecurityHistoricalData <- function(fshd){
   if(nrow(fshd$FSHD_watchlist) != 0){
-    result_summary <- fshd$FSHD_watchlist[,c("LocalTicker","Currency","SecurityType")]
+    result_summary <- fshd$FSHD_watchlist[,c("Symbol","Currency","Security Type")]
     
     # "Frequency","SpltAdj","DivAdj","RunResult"
     result_summary$Frequency <- rep(fshd$FSHD_freq, nrow(result_summary))
@@ -225,7 +225,7 @@ FSHDObtainAllHistPrcs.FinancialSecurityHistoricalData <- function(fshd){
         prcs
         result_summary[i,"RunResult"] <- "Failed"
         print(paste("Error price data is not successfully downloaded for ticker ",
-                    result_summary[i, "LocalTicker"], " (", result_summary[i, "Currency"], ")",sep=""))
+                    result_summary[i, "Symbol"], " (", result_summary[i, "Currency"], ")",sep=""))
       }
     }
     
